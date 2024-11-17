@@ -1,33 +1,18 @@
-const { calculateCharge, calculateCombinedCharge } = require("../services/shippingService");
+const { findNearestWarehouse } = require("../services/warehouseService");
 
-const getShippingCharge = async (req, res) => {
-    const { warehouseId, customerId, deliverySpeed } = req.query;
-
-    if (!warehouseId || !customerId || !deliverySpeed) {
-        return res.status(400).json({ error: "Missing parameters" });
-    }
-
+const getNearestWarehouse = async (req, res, next) => {
     try {
-        const charge = await calculateCharge(warehouseId, customerId, deliverySpeed);
-        res.json({ shippingCharge: charge });
+        const { sellerLocation } = req.query;
+
+        if (!sellerLocation) {
+            return res.status(400).json({ error: "Seller location is required." });
+        }
+
+        const warehouse = await findNearestWarehouse(JSON.parse(sellerLocation));
+        res.json(warehouse);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 };
 
-const calculateShippingCharge = async (req, res) => {
-    const { sellerId, customerId, deliverySpeed } = req.body;
-
-    if (!sellerId || !customerId || !deliverySpeed) {
-        return res.status(400).json({ error: "Missing parameters" });
-    }
-
-    try {
-        const result = await calculateCombinedCharge(sellerId, customerId, deliverySpeed);
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-module.exports = { getShippingCharge, calculateShippingCharge };
+module.exports = { getNearestWarehouse };
