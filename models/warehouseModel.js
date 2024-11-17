@@ -1,13 +1,35 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const warehouseSchema = new mongoose.Schema({
-    name: String,
-    location: {
-        lat: Number,
-        lng: Number,
+    name: {
+        type: String,
+        required: true,
+        trim: true
     },
-});
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number],
+            required: true
+        }
+    },
+    address: {
+        street: String,
+        city: String,
+        state: String,
+        pincode: String
+    },
+    capacity: Number,
+    isActive: {
+        type: Boolean,
+        default: true
+    }
+}, { timestamps: true });
 
-const Warehouse = mongoose.model("Warehouse", warehouseSchema);
+warehouseSchema.index({ location: '2dsphere' });
 
-module.exports = Warehouse;
+module.exports = mongoose.model('Warehouse', warehouseSchema);
