@@ -32,7 +32,8 @@ const calculateShippingChargeForWareHouseToCustomer = async (req, res, next) => 
         // Fetch warehouse and customer data
         const warehouse = await warehouseModel.findById(warehouseId);
         const customer = await customerModel.findById(customerId);
-
+        console.log(warehouse, "warehouse")
+        console.log(customer, "customer")
         if (!warehouse) {
             return res.status(404).json({ error: "Warehouse not found." });
         }
@@ -42,9 +43,11 @@ const calculateShippingChargeForWareHouseToCustomer = async (req, res, next) => 
 
         // Calculate the distance between warehouse and customer
         const distance = haversineDistance(warehouse.location, customer.location);
-
+        console.log(distance, "distance")
         // Calculate the shipping charge
+        console.log(distance, deliverySpeed, "distance deliveryspped")
         const shippingCharge = calculateCharge(distance, deliverySpeed);
+        console.log(shippingCharge, "shipping charge")
 
         // Return only the shipping charge
         res.status(200).json({ shippingCharge });
